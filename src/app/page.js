@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { getCookie, setCookie } from "@/utils/cookies";
 import { useRouter } from "next/navigation";
@@ -8,6 +8,7 @@ const instance = axios.create({ timeout: 1000 * 60 * 2 });
 
 export default function Home() {
   const imageElementScale = useRef(1);
+  const [isRedirect, setIsRedirect] = useState(!!getCookie("witnessName"));
   const start = useRef({});
   const router = useRouter();
 
@@ -16,6 +17,8 @@ export default function Home() {
       .get("https://jsonplaceholder.typicode.com/todos", {})
       .then((response) => {
         console.log(response.data);
+        setIsRedirect(true);
+        setCookie("witnessName", "Roofi", 1);
       })
       .catch((error) => {
         console.log(error);
@@ -53,23 +56,20 @@ export default function Home() {
       });
   };
 
-  useEffect(() => {
-    setTimeout(() => {
-      callAPI();
-      postAPI();
-    }, 5000);
-  }, []);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     callAPI();
+  //     postAPI();
+  //   }, 5000);
+  // }, []);
 
   useEffect(() => {
-    if (!getCookie("witnessName")) {
-      setTimeout(() => {
-        setCookie("witnessName", "Roofi", 1);
-        router.push("/witness");
-      }, 1000);
+    if (!isRedirect) {
+      callAPI();
     } else {
       router.push("/witness");
     }
-  }, []);
+  }, [isRedirect]);
 
   // useEffect(() => {
   //   const imageElement = document.getElementById("image");
